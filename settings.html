@@ -4,33 +4,85 @@
     <script type="text/javascript">
         // this is the proxy to allow loading the extension settings
         // also to run the cross site ajax scripts
+        // how it works:
+        // dispatch message from your injected script
+        // global html pages listens for messages. then sends message back
+        // injected script listens for messages 
         safari.application.addEventListener( "message", function( e ) {
-        safari.extension.globalPage.contentWindow.console.log(e.name);
-        if( e.name === "getSettings" ) {
-            e.target.page.dispatchMessage( "setSettings", {
-                username: safari.extension.settings.getItem( "username" ),
-                auth: safari.extension.settings.getItem( "auth" ),
-                api: safari.extension.settings.getItem( "api" ),
-                referral: safari.extension.settings.getItem( "referral" ),
-            } );
-        } else if( e.name === "getSynccitLinks" ) {
-            var myRequest = new XMLHttpRequest();
-            var datastring = e.message;
-            myRequest.open("POST", safari.extension.settings.getItem( "api" ), true);
-            myRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            //myRequest.setRequestHeader("Content-Length", datastring.length);
-            //myRequest.setRequestHeader("Connection", "close");
-            myRequest.onreadystatechange = function() {
-                if(myRequest.readyState == 4 && myRequest.status == 200) {
-                    safari.extension.globalPage.contentWindow.console.log(myRequest.responseText);
-                    e.target.page.dispatchMessage( "setSynccitLinks", myRequest.responseText );
+            console.log(e.name);
+            if( e.name === "getSettings" ) {
+                e.target.page.dispatchMessage( "setSettings", {
+                    username: safari.extension.settings.getItem( "username" ),
+                    auth: safari.extension.settings.getItem( "auth" ),
+                    api: safari.extension.settings.getItem( "api" ),
+                    referral: safari.extension.settings.getItem( "referral" ),
+                } );
+            } else if( e.name === "getSynccitLinks" ) {
+                var myRequest = new XMLHttpRequest();
+                var datastring = e.message;
+                myRequest.open("POST", safari.extension.settings.getItem( "api" ), true);
+                myRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                //myRequest.setRequestHeader("Content-Length", datastring.length);
+                //myRequest.setRequestHeader("Connection", "close");
+                myRequest.onreadystatechange = function() {
+                    if(myRequest.readyState == 4 && myRequest.status == 200) {
+                        console.log(myRequest.responseText);
+                        e.target.page.dispatchMessage( "setSynccitLinks", myRequest.responseText );
 
-                    //parseLinks(myRequest.responseText);
+                        //parseLinks(myRequest.responseText);
+                    }
                 }
+                myRequest.send(datastring);
+            } else if( e.name === "readSynccitLink" ) {
+                var myRequest = new XMLHttpRequest();
+                var datastring = e.message;
+                myRequest.open("POST", safari.extension.settings.getItem( "api" ), true);
+                myRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                //myRequest.setRequestHeader("Content-Length", datastring.length);
+                //myRequest.setRequestHeader("Connection", "close");
+                myRequest.onreadystatechange = function() {
+                    if(myRequest.readyState == 4 && myRequest.status == 200) {
+                        console.log(myRequest.responseText);
+                        e.target.page.dispatchMessage( "markedSynccitLinks", myRequest );
+
+                        //parseLinks(myRequest.responseText);
+                    }
+                }
+                myRequest.send(datastring);
+            } else if( e.name === "readSynccitComment" ) {
+                var myRequest = new XMLHttpRequest();
+                var datastring = e.message;
+                myRequest.open("POST", safari.extension.settings.getItem( "api" ), true);
+                myRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                //myRequest.setRequestHeader("Content-Length", datastring.length);
+                //myRequest.setRequestHeader("Connection", "close");
+                myRequest.onreadystatechange = function() {
+                    if(myRequest.readyState == 4 && myRequest.status == 200) {
+                        console.log(myRequest.responseText);
+                        e.target.page.dispatchMessage( "markedSynccitSelf", myRequest );
+
+                        //parseLinks(myRequest.responseText);
+                    }
+                }
+                myRequest.send(datastring);
+            } else if( e.name === "readSynccitSelf" ) {
+                var myRequest = new XMLHttpRequest();
+                var datastring = e.message;
+                myRequest.open("POST", safari.extension.settings.getItem( "api" ), true);
+                myRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                //myRequest.setRequestHeader("Content-Length", datastring.length);
+                //myRequest.setRequestHeader("Connection", "close");
+                myRequest.onreadystatechange = function() {
+                    if(myRequest.readyState == 4 && myRequest.status == 200) {
+                        console.log(myRequest.responseText);
+                        e.target.page.dispatchMessage( "markedSynccitSelf", myRequest );
+
+                        //parseLinks(myRequest.responseText);
+                    }
+                }
+                myRequest.send(datastring);
             }
-            myRequest.send(datastring);
-        }
-    }, false );
+        }, false );
     
   </script>
 </head>

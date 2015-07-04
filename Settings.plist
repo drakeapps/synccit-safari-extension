@@ -20,7 +20,7 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<string>https://api.synccit.com</string>
+		<string>https://api.synccit.com/api.php</string>
 		<key>Key</key>
 		<string>api</string>
 		<key>Title</key>

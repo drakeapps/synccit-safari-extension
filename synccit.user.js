@@ -11,7 +11,12 @@
 
 console.log("loaded extension");
 
+var username;
+var api;
+var auth;
+var referral;
 
+var devname = "synccit-safari,v1.0";
 
 
 function parseLinks(links) {
@@ -247,98 +252,22 @@ function addSelf(link, count) {
 function clickedLink(link) {
 	var datastring = "username=" + username + "&auth=" + auth + "&dev=" + devname + "&mode=update" + "&links=" + link;
 	//console.log(datastring);
-	GM_xmlhttpRequest({
-	  method: "POST",
-	  url: api,
-	  data: datastring,
-	  headers: {
-	    "Content-Type": "application/x-www-form-urlencoded"
-	  },
-	  onload: function(response) {
-		
-		console.log(response.responseText);
-		var array = localStorage['synccit-link'].split(',');
-		if(array.length < 2) {
-			localStorage['synccit-link'] = "";
-		} else {
-			for(var i=0; i<array.length; i++) {
-				if(array[i] == link) {
-					array = array.splice(i, 1);
-				}
-			}
-			localStorage['synccit-link'] = array.toString();
-		}
-		return true;
-
-	  }
-	});
-
 	
-
+    safari.self.tab.dispatchMessage( "readSynccitLink", datastring );
 }
 
 function clickedComment(link, count) {
 	var datastring = "username=" + username + "&auth=" + auth + "&dev=" + devname + "&mode=update" + "&comments=" + link + ":" + count;
-
-	GM_xmlhttpRequest({
-	  method: "POST",
-	  url: api,
-	  data: datastring,
-	  headers: {
-	    "Content-Type": "application/x-www-form-urlencoded"
-	  },
-	  onload: function(response) {
-		
-		console.log(response.responseText);
-		var array = localStorage['synccit-comment'].split(',');
-
-		if(array.length < 2) {
-			localStorage['synccit-comment'] = "";
-		} else {
-			for(var i=0; i<array.length; i++) {
-				var sp = array[i].split(':');
-				if(sp[0] == link) {
-					array = array.splice(i, 1);
-				}
-			}
-			localStorage['synccit-comment'] = array.toString();
-		}
-		return true;
-
-	  }
-	});
+    
+    safari.self.tab.dispatchMessage( "readSynccitComment", datastring );
 
 }
 
 function clickedSelf(link, count) {
 	var datastring = "username=" + username + "&auth=" + auth + "&dev=" + devname + "&mode=update" + "&links=" + link + "&comments=" + link + ":" + count;
-
-	GM_xmlhttpRequest({
-	  method: "POST",
-	  url: api,
-	  data: datastring,
-	  headers: {
-	    "Content-Type": "application/x-www-form-urlencoded"
-	  },
-	  onload: function(response) {
-		
-		console.log(response.responseText);
-		var array = localStorage['synccit-self'].split(',');
-		if(array.length < 2) {
-			localStorage['synccit-self'] = "";
-		} else {
-			for(var i=0; i<array.length; i++) {
-				var sp = array[i].split(':');
-				if(sp[0] == link) {
-					array = array.splice(i, 1);
-				}
-			}
-			localStorage['synccit-self'] = array.toString();
-		}
-		return true;
-
-	  }
-	});
+    
+    safari.self.tab.dispatchMessage( "readSynccitSelf", datastring );
+    
 }
 
 function addShowPage() {
@@ -546,7 +475,61 @@ function closePage() {
 	window.location.reload();
 }
 
+function markedLink(response) {
 
+    console.log(response.responseText);
+    var array = localStorage['synccit-link'].split(',');
+    if(array.length < 2) {
+        localStorage['synccit-link'] = "";
+    } else {
+        for(var i=0; i<array.length; i++) {
+            if(array[i] == link) {
+                array = array.splice(i, 1);
+            }
+        }
+        localStorage['synccit-link'] = array.toString();
+    }
+    return true;
+
+}
+
+function markedComment(response) {
+
+    console.log(response.responseText);
+    var array = localStorage['synccit-comment'].split(',');
+
+    if(array.length < 2) {
+        localStorage['synccit-comment'] = "";
+    } else {
+        for(var i=0; i<array.length; i++) {
+            var sp = array[i].split(':');
+            if(sp[0] == link) {
+                array = array.splice(i, 1);
+            }
+        }
+        localStorage['synccit-comment'] = array.toString();
+    }
+    return true;
+
+}
+
+function markedSelf(response) {	
+    console.log(response.responseText);
+    var array = localStorage['synccit-self'].split(',');
+    if(array.length < 2) {
+        localStorage['synccit-self'] = "";
+    } else {
+        for(var i=0; i<array.length; i++) {
+            var sp = array[i].split(':');
+            if(sp[0] == link) {
+                array = array.splice(i, 1);
+            }
+        }
+        localStorage['synccit-self'] = array.toString();
+    }
+    return true;
+
+}
 
 function start(settings) {
   //var settings, init = function() {
@@ -556,14 +539,14 @@ function start(settings) {
 
     console.log("loaded init");
     console.log(settings);
-    var username = settings.username;
-    var auth = settings.auth;
-    var api = settings.api;
-    var referral = settings.referral;
+    username = settings.username;
+    auth = settings.auth;
+    api = settings.api;
+    referral = settings.referral;
 
     //console.log(username + ' '+ auth + ' ' + api);
 
-    var devname = "synccit-safari,v1.0";
+    
 
     // add addStyle if doesn't exist
     // if doesn't have xmlHttpRequest, that's a whole other issue
@@ -749,13 +732,26 @@ function start(settings) {
 safari.self.addEventListener( "message", function( e ) {
     console.log(e.name, " + ", e.message);
     if( e.name === "setSettings" ) {
-      settings = e.message;
-      start(settings);
+        var settings = e.message;
+        start(settings);
     }
     if( e.name === "setSynccitLinks" ) {
-        links = e.message;
+        var links = e.message;
         parseLinks(links);
     }
+    if( e.name === "markedSynccitLinks" ) {
+        var response = e.message;
+        markedLink(response);
+    }
+    if( e.name === "markedSynccitComments" ) {
+        var response = e.message;
+        markedComment(response);
+    }
+    if( e.name === "markedSynccitSelf" ) {
+        var response = e.message;
+        markedSelf(response);
+    }
+    
 }, false );
 
 // ask proxy.html for settings
