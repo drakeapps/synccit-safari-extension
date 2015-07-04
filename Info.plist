@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>Drake Apps, LLC</string>
+	<key>Builder Version</key>
+	<string>11601.1.35.2</string>
+	<key>CFBundleDisplayName</key>
+	<string>synccit</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.drakeapps.synccit-safari</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Database Quota</key>
+		<integer>1048576</integer>
+		<key>Global Page</key>
+		<string>settings.html</string>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>End</key>
+			<array>
+				<string>synccit.user.js</string>
+			</array>
+		</dict>
+	</dict>
+	<key>Description</key>
+	<string>Safari extension for synccit.com</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Allowed Domains</key>
+			<array>
+				<string>*.reddit.com</string>
+				<string>*.synccit.com</string>
+			</array>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>Some</string>
+		</dict>
+	</dict>
+	<key>Website</key>
+	<string>https://synccit.com</string>
+</dict>
+</plist>

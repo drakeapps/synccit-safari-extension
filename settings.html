@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script type="text/javascript">
+        // this is the proxy to allow loading the extension settings
+        // also to run the cross site ajax scripts
+        safari.application.addEventListener( "message", function( e ) {
+        safari.extension.globalPage.contentWindow.console.log(e.name);
+        if( e.name === "getSettings" ) {
+            e.target.page.dispatchMessage( "setSettings", {
+                username: safari.extension.settings.getItem( "username" ),
+                auth: safari.extension.settings.getItem( "auth" ),
+                api: safari.extension.settings.getItem( "api" ),
+                referral: safari.extension.settings.getItem( "referral" ),
+            } );
+        } else if( e.name === "getSynccitLinks" ) {
+            var myRequest = new XMLHttpRequest();
+            var datastring = e.message;
+            myRequest.open("POST", safari.extension.settings.getItem( "api" ), true);
+            myRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            //myRequest.setRequestHeader("Content-Length", datastring.length);
+            //myRequest.setRequestHeader("Connection", "close");
+            myRequest.onreadystatechange = function() {
+                if(myRequest.readyState == 4 && myRequest.status == 200) {
+                    safari.extension.globalPage.contentWindow.console.log(myRequest.responseText);
+                    e.target.page.dispatchMessage( "setSynccitLinks", myRequest.responseText );
+
+                    //parseLinks(myRequest.responseText);
+                }
+            }
+            myRequest.send(datastring);
+        }
+    }, false );
+    
+  </script>
+</head>
+<body></body>
+</html>
